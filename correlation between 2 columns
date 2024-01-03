@@ -1,0 +1,23 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Cargar datos desde el archivo CSV
+archivo_csv = 'ruta/del/archivo.csv'  # Reemplaza con la ruta correcta de tu archivo CSV
+datos = pd.read_csv(archivo_csv)
+
+# Seleccionar las dos columnas para calcular la correlación
+columna1 = 'Nombre_Columna1'  # Reemplaza con el nombre de la primera columna
+columna2 = 'Nombre_Columna2'  # Reemplaza con el nombre de la segunda columna
+
+# Calcular la correlación
+correlacion = datos[columna1].corr(datos[columna2])
+
+# Crear un gráfico de dispersión
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=datos[columna1], y=datos[columna2])
+plt.title(f'Gráfico de Dispersión\nCorrelación: {correlacion:.2f}')
+plt.xlabel(columna1)
+plt.ylabel(columna2)
+plt.grid(True)
+plt.show()
