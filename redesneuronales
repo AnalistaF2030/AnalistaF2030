@@ -1,0 +1,68 @@
+#CON HIPERPARAMETROS AJUSTADOS
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import os # Importar el módulo os
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+# Crear un DataFrame con los datos proporcionados
+data = pd.DataFrame({
+    'fecha': [2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 1970],
+    'total_video_count': [299715, 310127, 199772, 394106, 996126, 685237, 607139, 536807, 467994, 665556, 666330, 1101456, 1196109, 340569, 540]
+})
+
+# Replicar datos para aumentar la cantidad de datos de entrenamiento
+data_expanded = pd.concat([data] * 500, ignore_index=True)
+
+# Extraer la columna 'total_video_count' como nuestro objetivo (y)
+y = data_expanded['total_video_count'].values
+
+# Extraer la columna 'fecha' como nuestra característica (X)
+X = data_expanded['fecha'].values.reshape(-1, 1)
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Escalar las características
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Crear y entrenar el modelo de redes neuronales
+model = MLPRegressor(max_iter=10000, random_state=42)
+model.fit(X_train_scaled, y_train)
+
+# Realizar predicciones en el conjunto de prueba
+y_pred = model.predict(X_test_scaled)
+
+# Evaluar el rendimiento del modelo
+mse = mean_squared_error(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f'Métricas con datos de prueba:\nError Cuadrático Medio (MSE): {mse}\nError Absoluto Medio (MAE): {mae}\nCoeficiente de Determinación (R^2): {r2}')
+
+# Hacer predicciones para los años 2019, 2020 y 2021
+years_to_predict = [2019, 2020, 2021]
+predictions = model.predict(scaler.transform(np.array(years_to_predict).reshape(-1, 1)))
+
+for year, prediction in zip(years_to_predict, predictions):
+    print(f'Predicción para el año {year}: {prediction}')
+
+# Visualización de los datos y las predicciones
+plt.scatter(X_test, y_test, color='black', label='Datos de prueba')
+plt.plot(X_test, y_pred, color='blue', linewidth=3, label='Predicciones')
+plt.scatter(years_to_predict, predictions, color='red', marker='o', label='Predicciones para 2019, 2020, 2021')
+plt.title('Predicciones del modelo de redes neuronales')
+plt.xlabel('Año')
+plt.ylabel('Total Video Count')
+plt.legend()
+plt.show()
+
+# Limpiar la consola
+os.system("cls")
+# Imprimir un mensaje
+print("¡La consola está limpia!")
